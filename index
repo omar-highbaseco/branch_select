@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Highbase — Select Your Branch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:    #1E5BB8;
+  --primary-dk: #164A99;
+  --primary-lt: #E8F0FB;
+  --ink:        #0F1E36;
+  --ink-2:      #2D3E5C;
+  --ink-3:      #5A6B85;
+  --ink-4:      #94A3B8;
+  --border:     #E2E8F0;
+  --bg:         #F4F7FB;
+  --card:       #FFFFFF;
+  --success:    #16A34A;
+  --success-lt: #DCFCE7;
+  --danger:     #DC2626;
+  --danger-lt:  #FEE2E2;
+  --shadow:     0 4px 16px rgba(15,30,54,.08), 0 1px 2px rgba(15,30,54,.04);
+  --shadow-lg:  0 12px 32px rgba(15,30,54,.12);
+  --r:          14px;
+  --r-sm:       10px;
+  --r-pill:     999px;
+}
+
+html { -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 16px 60px;
+}
+
+/* ── Header ── */
+.header {
+  width: 100%; max-width: 520px;
+  padding: 28px 0 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+.logo {
+  font-family: 'Manrope', sans-serif;
+  font-size: 20px; font-weight: 800;
+  color: var(--primary);
+  letter-spacing: .02em;
+}
+.logo-sep { width: 1px; height: 18px; background: var(--border); }
+.logo-sub { font-size: 11px; color: var(--ink-4); font-weight: 500; letter-spacing: .04em; }
+
+/* ── Card wrapper ── */
+.card {
+  width: 100%; max-width: 520px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ── Card header ── */
+.card-head {
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.card-head h1 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: var(--ink); margin-bottom: 6px;
+}
+.card-head p {
+  font-size: 13.5px; color: var(--ink-3); line-height: 1.6;
+}
+
+/* ── Branch list ── */
+.branch-list {
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.branch-option {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  background: var(--card);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.branch-option:hover   { border-color: #93B4E8; background: #F5F8FE; }
+.branch-option.selected {
+  border-color: var(--primary);
+  background: var(--primary-lt);
+  box-shadow: 0 0 0 3px rgba(30,91,184,.10);
+}
+
+/* Radio dot */
+.radio {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--ink-4);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s;
+}
+.branch-option.selected .radio { border-color: var(--primary); }
+.radio-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary);
+  display: none;
+}
+.branch-option.selected .radio-dot { display: block; }
+
+/* Branch avatar */
+.avatar {
+  width: 42px; height: 42px; border-radius: 10px;
+  flex-shrink: 0; overflow: hidden;
+  background: var(--primary-lt);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: var(--primary);
+  letter-spacing: -.01em;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Branch info */
+.branch-info { flex: 1; min-width: 0; }
+.branch-name {
+  font-size: 14px; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.branch-sub { font-size: 12px; color: var(--ink-4); }
+
+/* Currency badge */
+.currency-badge {
+  font-size: 11px; font-weight: 600; color: var(--primary);
+  background: var(--primary-lt);
+  padding: 3px 9px; border-radius: var(--r-pill);
+  flex-shrink: 0;
+}
+
+/* ── Footer / submit area ── */
+.card-foot {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.btn-submit {
+  width: 100%; padding: 13px;
+  background: var(--primary); color: white;
+  border: none; border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .15s, transform .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:hover:not(:disabled)  { background: var(--primary-dk); }
+.btn-submit:active:not(:disabled) { transform: scale(.98); }
+.btn-submit:disabled {
+  background: var(--border); color: var(--ink-4); cursor: not-allowed;
+}
+.btn-submit.loading { pointer-events: none; }
+.spinner {
+  display: none;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: white;
+  border-radius: 50%; animation: spin .6s linear infinite;
+}
+.btn-submit.loading .spinner { display: block; }
+.btn-submit.loading .btn-label { display: none; }
+
+/* ── State screens ── */
+.state-screen {
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 60vh; text-align: center;
+  gap: 12px; padding: 40px 24px;
+  width: 100%; max-width: 520px;
+}
+.state-screen.show { display: flex; }
+.state-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.success-icon { background: var(--success-lt); animation: pop .4s cubic-bezier(.34,1.56,.64,1) both; }
+.error-icon   { background: var(--danger-lt); }
+.state-screen h2 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; color: var(--ink); }
+.state-screen p  { font-size: 14px; color: var(--ink-3); max-width: 320px; line-height: 1.6; }
+
+/* Loading screen */
+#loadingScreen {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 60vh; gap: 14px;
+}
+.loader {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border); border-top-color: var(--primary);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+
+/* ── Error banner ── */
+.err-banner {
+  display: none; margin: 0 16px 12px;
+  padding: 10px 14px; border-radius: var(--r-sm);
+  background: var(--danger-lt); border: 1px solid rgba(220,38,38,.2);
+  font-size: 13px; color: var(--danger);
+}
+.err-banner.show { display: block; }
+
+/* ── Powered by ── */
+.powered {
+  margin-top: 20px;
+  font-size: 12px; color: var(--ink-4);
+  display: flex; align-items: center; gap: 5px;
+}
+.powered svg { opacity: .5; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pop  { from { opacity:0; transform: scale(.5); } to { opacity:1; transform: scale(1); } }
+@keyframes fadeUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">HIGHBASE</div>
+  <div class="logo-sep"></div>
+  <div class="logo-sub">Branch Selection</div>
+</div>
+
+<!-- Loading -->
+<div id="loadingScreen">
+  <div class="loader"></div>
+  <p style="font-size:14px;color:var(--ink-3)">Loading your branches…</p>
+</div>
+
+<!-- Main card -->
+<div class="card" id="mainCard" style="display:none; animation: fadeUp .35s ease both;">
+  <div class="card-head">
+    <h1>Select Your Branch</h1>
+    <p>You have access to multiple branches. Please choose which branch you'd like to use for your review link.</p>
+  </div>
+  <div class="branch-list" id="branchList"></div>
+  <div class="err-banner" id="errBanner"></div>
+  <div class="card-foot">
+    <button class="btn-submit" id="submitBtn" disabled onclick="submitSelection()">
+      <span class="btn-label">Confirm Selection</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+</div>
+
+<!-- Success -->
+<div class="state-screen" id="successScreen">
+  <div class="state-icon success-icon">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2>Branch selected!</h2>
+  <p id="successMsg">Your review link is being prepared and will be sent to your WhatsApp shortly.</p>
+</div>
+
+<!-- Error screen -->
+<div class="state-screen" id="errorScreen">
+  <div class="state-icon error-icon">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#DC2626"/></svg>
+  </div>
+  <h2>Something went wrong</h2>
+  <p id="errorMsg">Could not load branch data. Please ask Highbase to resend the link.</p>
+</div>
+
+<div class="powered">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Secured by Highbase
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────
+let branches   = [];
+let resumeUrl  = null;
+let selectedId = null;
+
+// ── Boot ──────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+
+  // n8n appends resumeUrl automatically for Custom Action URL
+  resumeUrl = params.get('resumeUrl') || params.get('resume') || null;
+
+  // Branches encoded as base64 JSON
+  const rawData = params.get('data') || null;
+
+  if (!rawData) {
+    showError('No branch data found. Please ask Highbase to resend the link.');
+    return;
+  }
+
+  try {
+    branches = JSON.parse(atob(rawData));
+  } catch (e) {
+    // Try URI-decoded fallback
+    try { branches = JSON.parse(decodeURIComponent(rawData)); }
+    catch { showError('Invalid branch data. Please ask Highbase to resend the link.'); return; }
+  }
+
+  if (!Array.isArray(branches) || branches.length === 0) {
+    showError('No branches found in your account.');
+    return;
+  }
+
+  hide('loadingScreen');
+  renderBranches();
+  show('mainCard');
+});
+
+// ── Render ─────────────────────────────────────────────────────────────
+function renderBranches() {
+  const list = document.getElementById('branchList');
+  list.innerHTML = '';
+
+  branches.forEach(b => {
+    const initials = b.name.slice(0, 2).toUpperCase();
+    const div = document.createElement('div');
+    div.className = 'branch-option';
+    div.dataset.id = b.id;
+    div.onclick = () => selectBranch(b.id, div);
+
+    div.innerHTML =
+      '<div class="radio"><div class="radio-dot"></div></div>' +
+      '<div class="avatar">' +
+        (b.image
+          ? '<img src="' + esc(b.image) + '" onerror="this.parentElement.textContent=\'' + initials + '\'" alt="">'
+          : initials
+        ) +
+      '</div>' +
+      '<div class="branch-info">' +
+        '<div class="branch-name">' + esc(b.name) + '</div>' +
+        '<div class="branch-sub">ID: ' + esc(String(b.id)) + '</div>' +
+      '</div>' +
+      '<div class="currency-badge">' + esc(b.currency || 'BHD') + '</div>';
+
+    list.appendChild(div);
+  });
+}
+
+function selectBranch(id, el) {
+  document.querySelectorAll('.branch-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedId = id;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('errBanner').classList.remove('show');
+}
+
+// ── Submit ─────────────────────────────────────────────────────────────
+async function submitSelection() {
+  if (!selectedId) return;
+
+  const branch = branches.find(b => b.id === selectedId);
+  if (!branch) return;
+
+  if (!resumeUrl) {
+    // No resume URL — still show success (link may have been sent separately)
+    showSuccess(branch.name);
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading');
+  document.getElementById('errBanner').classList.remove('show');
+
+  const payload = {
+    data: {
+      selected_branch_id: branch.name,
+      branch_id:          branch.id,
+      branch_slug:        branch.slug,
+      branch_currency:    branch.currency || 'BHD',
+      branch_name:        branch.name,
+    }
+  };
+
+  try {
+    const res = await fetch(decodeURIComponent(resumeUrl), {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    showSuccess(branch.name);
+
+  } catch (err) {
+    console.error('Submit error:', err);
+    btn.classList.remove('loading');
+    const banner = document.getElementById('errBanner');
+    banner.textContent = 'Could not confirm selection. Please try again.';
+    banner.classList.add('show');
+  }
+}
+
+// ── State helpers ──────────────────────────────────────────────────────
+function showSuccess(branchName) {
+  hide('mainCard');
+  document.getElementById('successMsg').textContent =
+    'You selected "' + branchName + '". Your personalised review link is being prepared and will arrive on WhatsApp shortly.';
+  show('successScreen');
+}
+
+function showError(msg) {
+  hide('loadingScreen');
+  hide('mainCard');
+  document.getElementById('errorMsg').textContent = msg;
+  show('errorScreen');
+}
+
+function show(id) { document.getElementById(id).style.display = 'flex'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function esc(s)   { return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
