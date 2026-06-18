@@ -16,362 +16,369 @@
   --ink-3:      #5A6B85;
   --ink-4:      #94A3B8;
   --border:     #E2E8F0;
-  --bg:         #F4F7FB;
+  --bg:         #EFF4FB;
   --card:       #FFFFFF;
-  --success-lt: #DCFCE7;
   --danger:     #DC2626;
   --danger-lt:  #FEE2E2;
   --warning:    #D97706;
   --warning-lt: #FEF3C7;
-  --shadow:     0 4px 16px rgba(15,30,54,.08), 0 1px 2px rgba(15,30,54,.04);
-  --r: 14px; --r-sm: 10px; --r-pill: 999px;
+  --success-lt: #DCFCE7;
+  --shadow:     0 8px 32px rgba(15,30,54,.10), 0 1px 2px rgba(15,30,54,.06);
+  --r:    16px;
+  --r-sm: 10px;
 }
 html { -webkit-font-smoothing: antialiased; }
+
 body {
   font-family: 'Inter', -apple-system, sans-serif;
-  background: var(--bg); color: var(--ink);
+  background: var(--bg);
   min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 0 16px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
 }
-.header {
-  width: 100%; max-width: 520px;
-  padding: 28px 0 22px;
-  display: flex; align-items: center; gap: 10px;
-}
-.logo { font-family:'Manrope',sans-serif; font-size:20px; font-weight:800; color:var(--primary); }
-.logo-sep { width:1px; height:18px; background:var(--border); }
-.logo-sub { font-size:11px; color:var(--ink-4); font-weight:500; letter-spacing:.04em; }
 
+/* ── Card ── */
 .card {
-  width:100%; max-width:520px;
-  background:var(--card); border:1px solid var(--border);
-  border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden;
-  animation: fadeUp .35s ease both;
+  background: var(--card);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 440px;
+  padding: 36px 32px 28px;
+  animation: fadeUp .3s ease both;
 }
-.card-head { padding:22px 22px 18px; border-bottom:1px solid var(--border); }
-.card-head h1 { font-family:'Manrope',sans-serif; font-size:17px; font-weight:800; color:var(--ink); margin-bottom:5px; }
-.card-head p  { font-size:13px; color:var(--ink-3); line-height:1.6; }
 
-.branch-list { padding:14px; display:flex; flex-direction:column; gap:10px; }
-
-.branch-option {
-  display:flex; align-items:center; gap:12px;
-  padding:13px 14px; border:1.5px solid var(--border);
-  border-radius:var(--r-sm); cursor:pointer;
-  transition: border-color .15s, background .15s, box-shadow .15s;
-  background:var(--card); -webkit-tap-highlight-color:transparent;
+/* Logo */
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 28px;
 }
-.branch-option:hover    { border-color:#93B4E8; background:#F5F8FE; }
-.branch-option.selected {
-  border-color:var(--primary); background:var(--primary-lt);
+.logo {
+  font-family: 'Manrope', sans-serif;
+  font-size: 22px; font-weight: 800;
+  color: var(--primary); letter-spacing: .02em;
+}
+.logo-sep { width: 1px; height: 20px; background: var(--border); }
+.logo-sub { font-size: 11px; color: var(--ink-4); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+
+/* Text */
+.card h1 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: var(--ink); text-align: center;
+  margin-bottom: 8px;
+}
+.card p {
+  font-size: 13.5px; color: var(--ink-3);
+  text-align: center; line-height: 1.65;
+  margin-bottom: 28px;
+}
+
+/* Label */
+.field-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 8px; display: block;
+}
+.required { color: var(--primary); }
+
+/* Dropdown */
+.select-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+.select-wrap select {
+  width: 100%;
+  padding: 12px 42px 12px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.select-wrap select:focus {
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(30,91,184,.10);
 }
-.radio {
-  width:18px; height:18px; border-radius:50%;
-  border:2px solid var(--ink-4); flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-  transition:border-color .15s;
-}
-.branch-option.selected .radio { border-color:var(--primary); }
-.radio-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); display:none; }
-.branch-option.selected .radio-dot { display:block; }
-.avatar {
-  width:40px; height:40px; border-radius:9px; flex-shrink:0;
-  background:var(--primary-lt);
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px; font-weight:700; color:var(--primary); overflow:hidden;
-}
-.avatar img { width:100%; height:100%; object-fit:cover; }
-.branch-info { flex:1; min-width:0; }
-.branch-name { font-size:14px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-.branch-sub  { font-size:11.5px; color:var(--ink-4); }
-.currency-badge {
-  font-size:11px; font-weight:600; color:var(--primary);
-  background:var(--primary-lt); padding:3px 9px;
-  border-radius:var(--r-pill); flex-shrink:0;
+.select-wrap select:hover { border-color: #93B4E8; }
+.select-arrow {
+  position: absolute; right: 13px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; color: var(--ink-4);
 }
 
-.card-foot { padding:14px; border-top:1px solid var(--border); }
+/* Timer */
+.timer {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px;
+  background: var(--warning-lt);
+  font-size: 12px; font-weight: 500; color: var(--warning);
+  margin-bottom: 20px;
+  transition: background .3s, color .3s;
+}
+.timer.urgent { background: var(--danger-lt); color: var(--danger); }
+.timer.hidden { display: none; }
+
+/* Button */
 .btn {
-  width:100%; padding:13px;
-  background:var(--primary); color:white; border:none;
-  border-radius:var(--r-sm);
-  font-family:'Inter',sans-serif; font-size:14px; font-weight:600;
-  cursor:pointer; transition:background .15s, transform .15s;
-  display:flex; align-items:center; justify-content:center; gap:8px;
+  width: 100%; padding: 13px;
+  background: var(--primary); color: white; border: none;
+  border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s, transform .1s;
 }
-.btn:hover:not(:disabled)  { background:var(--primary-dk); }
-.btn:active:not(:disabled) { transform:scale(.98); }
-.btn:disabled { background:var(--border); color:var(--ink-4); cursor:not-allowed; }
-.btn.loading  { pointer-events:none; }
-.btn.loading .btn-label { display:none; }
+.btn:hover:not(:disabled)  { background: var(--primary-dk); }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn:disabled { background: var(--border); color: var(--ink-4); cursor: not-allowed; }
+.btn.loading  { pointer-events: none; }
+.btn.loading .btn-label { display: none; }
 .btn .spinner {
-  display:none; width:16px; height:16px;
-  border:2px solid rgba(255,255,255,.3); border-top-color:white;
-  border-radius:50%; animation:spin .6s linear infinite;
+  display: none; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: white;
+  border-radius: 50%; animation: spin .6s linear infinite;
 }
-.btn.loading .spinner { display:block; }
+.btn.loading .spinner { display: block; }
 
-.err-banner {
-  display:none; margin:0 14px 10px; padding:10px 13px;
-  border-radius:var(--r-sm);
-  background:var(--danger-lt); border:1px solid rgba(220,38,38,.2);
-  font-size:12.5px; color:var(--danger);
+/* Error */
+.err {
+  display: none; margin-bottom: 14px;
+  padding: 10px 13px; border-radius: 8px;
+  background: var(--danger-lt); font-size: 12.5px; color: var(--danger);
 }
-.err-banner.show { display:block; }
+.err.show { display: block; }
 
-.timer-bar {
-  display:flex; align-items:center; gap:7px;
-  margin:0 14px 10px; padding:9px 13px;
-  border-radius:var(--r-sm);
-  background:var(--warning-lt); border:1px solid rgba(217,119,6,.2);
-  font-size:12px; color:var(--warning); font-weight:500;
+/* Powered */
+.powered {
+  text-align: center; margin-top: 18px;
+  font-size: 11.5px; color: var(--ink-4);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
 }
 
-.state {
-  display:none; flex-direction:column; align-items:center;
-  justify-content:center; min-height:55vh; text-align:center;
-  gap:12px; padding:40px 24px;
-  width:100%; max-width:520px;
-  animation: fadeUp .35s ease both;
+/* ── Full-screen states ── */
+.screen {
+  background: var(--card);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  width: 100%; max-width: 440px;
+  padding: 52px 32px;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 12px;
+  animation: fadeUp .3s ease both;
 }
-.state.show { display:flex; }
-.state-icon {
-  width:68px; height:68px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center; margin-bottom:6px;
+.screen.show { display: flex; }
+.screen-icon {
+  width: 68px; height: 68px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
 }
-.state h2 { font-family:'Manrope',sans-serif; font-size:21px; font-weight:800; color:var(--ink); }
-.state p  { font-size:13.5px; color:var(--ink-3); max-width:300px; line-height:1.65; }
+.screen h2 { font-family:'Manrope',sans-serif; font-size:20px; font-weight:800; color:var(--ink); }
+.screen p  { font-size:13.5px; color:var(--ink-3); max-width:280px; line-height:1.65; }
 
-#loadingScreen {
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:center; min-height:55vh; gap:14px;
+/* Loading */
+.loading-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
 }
 .loader {
-  width:38px; height:38px;
-  border:3px solid var(--border); border-top-color:var(--primary);
-  border-radius:50%; animation:spin .8s linear infinite;
-}
-#loadingMsg { font-size:13px; color:var(--ink-4); }
-
-.powered {
-  margin-top:18px; font-size:11.5px; color:var(--ink-4);
-  display:flex; align-items:center; gap:5px;
+  width: 36px; height: 36px;
+  border: 3px solid var(--border); border-top-color: var(--primary);
+  border-radius: 50%; animation: spin .8s linear infinite;
 }
 
-@keyframes spin   { to { transform:rotate(360deg); } }
+@keyframes spin   { to { transform: rotate(360deg); } }
 @keyframes pop    { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:scale(1); } }
-@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo">HIGHBASE</div>
-  <div class="logo-sep"></div>
-  <div class="logo-sub">Branch Selection</div>
-</div>
-
-<div id="loadingScreen">
+<!-- Loading -->
+<div class="loading-wrap" id="loadingScreen">
   <div class="loader"></div>
-  <p id="loadingMsg">Loading your branches…</p>
+  <p style="font-size:13px;color:var(--ink-4)" id="loadingMsg">Loading your branches…</p>
 </div>
 
+<!-- Main card -->
 <div class="card" id="mainCard" style="display:none;">
-  <div class="card-head">
-    <h1>Select Your Branch</h1>
-    <p>You have access to multiple branches. Choose which one you'd like to use for your review link.</p>
+  <div class="logo-wrap">
+    <div class="logo">HIGHBASE</div>
+    <div class="logo-sep"></div>
+    <div class="logo-sub">Branch</div>
   </div>
-  <div class="branch-list" id="branchList"></div>
-  <div class="timer-bar" id="timerBar">
+
+  <h1>Select Your Branch</h1>
+  <p>You have access to multiple branches. Please choose which branch you'd like to use for your review link.</p>
+
+  <label class="field-label" for="branchSelect">
+    Select your branch <span class="required">*</span>
+  </label>
+  <div class="select-wrap">
+    <select id="branchSelect" onchange="onSelectChange()">
+      <option value="">Select an option…</option>
+    </select>
+    <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+
+  <div class="timer" id="timerBar">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     <span id="timerText">Link expires in 15:00</span>
   </div>
-  <div class="err-banner" id="errBanner"></div>
-  <div class="card-foot">
-    <button class="btn" id="submitBtn" disabled onclick="submitSelection()">
-      <span class="btn-label">Confirm Selection</span>
-      <div class="spinner"></div>
-    </button>
+
+  <div class="err" id="errBanner"></div>
+
+  <button class="btn" id="submitBtn" disabled onclick="submitSelection()">
+    <span class="btn-label">Confirm Selection</span>
+    <div class="spinner"></div>
+  </button>
+
+  <div class="powered">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Secured by Highbase · 15-minute link
   </div>
 </div>
 
 <!-- Success -->
-<div class="state" id="successScreen">
-  <div class="state-icon" style="background:var(--success-lt);animation:pop .4s cubic-bezier(.34,1.56,.64,1) both;">
+<div class="screen" id="successScreen">
+  <div class="screen-icon" style="background:var(--success-lt);animation:pop .4s cubic-bezier(.34,1.56,.64,1) both;">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
   <h2>Branch selected!</h2>
   <p id="successMsg">Your review link will arrive on WhatsApp shortly.</p>
+  <div class="powered" style="margin-top:8px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Secured by Highbase
+  </div>
 </div>
 
 <!-- Expired -->
-<div class="state" id="expiredScreen">
-  <div class="state-icon" style="background:var(--warning-lt);">
+<div class="screen" id="expiredScreen">
+  <div class="screen-icon" style="background:var(--warning-lt);">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#D97706"/></svg>
   </div>
   <h2>Link expired</h2>
-  <p>This link was only valid for 15 minutes. Please type "link" on WhatsApp to receive a new one.</p>
+  <p>This link was valid for 15 minutes only. Please type "link" on WhatsApp to receive a new one.</p>
 </div>
 
 <!-- Error -->
-<div class="state" id="errorScreen">
-  <div class="state-icon" style="background:var(--danger-lt);">
+<div class="screen" id="errorScreen">
+  <div class="screen-icon" style="background:var(--danger-lt);">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#DC2626"/></svg>
   </div>
   <h2>Something went wrong</h2>
   <p id="errorMsg">Could not load your branches. Please try again.</p>
 </div>
 
-<div class="powered">
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-  Secured by Highbase · 15-minute link
-</div>
-
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────
-const WEBHOOK_GET_BRANCHES   = 'https://n8n.srv1587311.hstgr.cloud/webhook/branches-data';
-const WEBHOOK_SELECT_BRANCH  = 'https://n8n.srv1587311.hstgr.cloud/webhook/selected-branch';
+const WEBHOOK_GET_BRANCHES  = 'https://n8n.srv1587311.hstgr.cloud/webhook/branches-data';
+const WEBHOOK_SELECT_BRANCH = 'https://n8n.srv1587311.hstgr.cloud/webhook/selected-branch';
 
-// ── State ─────────────────────────────────────────────────────────
 let branches     = [];
 let phoneNumber  = null;
 let branchNumber = null;
 let token        = null;
-let selectedId   = null;
 let timerInterval = null;
 
-// ── Boot ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   token = params.get('id');
 
-  if (!token) { showError('No access link found. Please ask Highbase to resend the link.'); return; }
+  if (!token) { showError('No access link found. Please type "link" on WhatsApp.'); return; }
 
   const payload = decodeJWT(token);
-  if (!payload) { showError('Invalid link. Please ask Highbase to resend the link.'); return; }
+  if (!payload) { showError('Invalid link. Please type "link" on WhatsApp to get a new one.'); return; }
 
-  // Check 15-minute expiry
-  const nowSec     = Math.floor(Date.now() / 1000);
-  const ageMinutes = Math.floor((nowSec - payload.iat) / 60);
-  if (ageMinutes >= 15) {
-    hide('loadingScreen');
-    show('expiredScreen');
-    return;
-  }
+  const nowSec = Math.floor(Date.now() / 1000);
+  if ((nowSec - payload.iat) >= 900) { hide('loadingScreen'); show('expiredScreen'); return; }
 
   phoneNumber  = String(payload.PhoneNumber  || '');
   branchNumber = String(payload.BranchNumber || phoneNumber);
 
-  // Fetch branches from n8n
-  await fetchBranches();
-  startTimer(payload.iat);
+  await fetchBranches(payload.iat);
 });
 
-// ── JWT decode (client-side) ───────────────────────────────────────
 function decodeJWT(raw) {
   try {
-    const parts  = raw.split('.');
+    const parts = raw.split('.');
     if (parts.length !== 3) return null;
-    const base64 = parts[1].replace(/-/g,'+').replace(/_/g,'/');
-    return JSON.parse(atob(base64));
+    return JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
   } catch { return null; }
 }
 
-// ── Fetch branches from n8n ───────────────────────────────────────
-async function fetchBranches() {
-  document.getElementById('loadingMsg').textContent = 'Loading your branches…';
-
+async function fetchBranches(iat) {
   try {
     const res = await fetch(
       WEBHOOK_GET_BRANCHES + '?phone=' + encodeURIComponent(branchNumber),
       { headers: { 'Authorization': 'Bearer ' + token } }
     );
-
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
     const data = await res.json();
+    branches = Array.isArray(data) ? data : (data.branches || []);
 
-    // Accept array directly or wrapped: { branches: [...] }
-    branches = Array.isArray(data)
-      ? data
-      : (data.branches || []);
+    if (!branches.length) { showError('No branches found for your account.'); return; }
 
-    if (branches.length === 0) { showError('No branches found for your account.'); return; }
+    // Populate dropdown
+    const sel = document.getElementById('branchSelect');
+    branches.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = String(b.id);
+      opt.textContent = b.name;
+      sel.appendChild(opt);
+    });
 
     hide('loadingScreen');
-    renderBranches();
     show('mainCard');
+    startTimer(iat);
 
   } catch (err) {
-    console.error('Fetch branches error:', err);
-    showError('Could not load your branches. Please try again or type "link" on WhatsApp.');
+    console.error(err);
+    showError('Could not load branches. Please type "link" on WhatsApp to try again.');
   }
 }
 
-// ── Timer ─────────────────────────────────────────────────────────
+function onSelectChange() {
+  const val = document.getElementById('branchSelect').value;
+  document.getElementById('submitBtn').disabled = !val;
+  document.getElementById('errBanner').classList.remove('show');
+}
+
 function startTimer(iat) {
   const expireSec = iat + 900;
   function tick() {
     const remaining = expireSec - Math.floor(Date.now() / 1000);
     if (remaining <= 0) {
       clearInterval(timerInterval);
-      hide('mainCard');
-      show('expiredScreen');
-      return;
+      hide('mainCard'); show('expiredScreen'); return;
     }
     const m = Math.floor(remaining / 60).toString().padStart(2,'0');
     const s = (remaining % 60).toString().padStart(2,'0');
     document.getElementById('timerText').textContent = 'Link expires in ' + m + ':' + s;
-    if (remaining <= 180) {
-      const bar = document.getElementById('timerBar');
-      bar.style.background = 'var(--danger-lt)';
-      bar.style.color      = 'var(--danger)';
-      bar.style.borderColor = 'rgba(220,38,38,.2)';
-    }
+    const bar = document.getElementById('timerBar');
+    if (remaining <= 180) bar.classList.add('urgent');
   }
   tick();
   timerInterval = setInterval(tick, 1000);
 }
 
-// ── Render ────────────────────────────────────────────────────────
-function renderBranches() {
-  const list = document.getElementById('branchList');
-  list.innerHTML = '';
-  branches.forEach(b => {
-    const initials = (b.name || 'HB').slice(0,2).toUpperCase();
-    const div = document.createElement('div');
-    div.className = 'branch-option';
-    div.dataset.id = String(b.id);
-    div.onclick = () => selectBranch(String(b.id), div);
-    div.innerHTML =
-      '<div class="radio"><div class="radio-dot"></div></div>' +
-      '<div class="avatar">' +
-        (b.image
-          ? '<img src="' + esc(b.image) + '" onerror="this.parentElement.textContent=\'' + initials + '\'">'
-          : initials) +
-      '</div>' +
-      '<div class="branch-info">' +
-        '<div class="branch-name">' + esc(b.name) + '</div>' +
-        '<div class="branch-sub">' + esc(b.slug || '') + '</div>' +
-      '</div>' +
-      '<div class="currency-badge">' + esc(b.currency || 'BHD') + '</div>';
-    list.appendChild(div);
-  });
-}
-
-function selectBranch(id, el) {
-  document.querySelectorAll('.branch-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedId = id;
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('errBanner').classList.remove('show');
-}
-
-// ── Submit ────────────────────────────────────────────────────────
 async function submitSelection() {
+  const selectedId = document.getElementById('branchSelect').value;
   if (!selectedId) return;
+
   const branch = branches.find(b => String(b.id) === selectedId);
   if (!branch) return;
 
@@ -381,13 +388,10 @@ async function submitSelection() {
 
   try {
     const res = await fetch(WEBHOOK_SELECT_BRANCH, {
-      method:  'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + token
-      },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({
-        token:           token,
+        token,
         phone_number:    phoneNumber,
         branch_number:   branchNumber,
         branch_id:       branch.id,
@@ -396,7 +400,6 @@ async function submitSelection() {
         branch_currency: branch.currency || 'BHD',
       })
     });
-
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
     clearInterval(timerInterval);
@@ -406,24 +409,19 @@ async function submitSelection() {
     show('successScreen');
 
   } catch (err) {
-    console.error('Submit error:', err);
     btn.classList.remove('loading');
-    const banner = document.getElementById('errBanner');
-    banner.textContent = 'Could not confirm. Please try again.';
-    banner.classList.add('show');
+    const b = document.getElementById('errBanner');
+    b.textContent = 'Could not confirm. Please try again.';
+    b.classList.add('show');
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────
-function show(id) { document.getElementById(id).style.display = 'flex'; }
+function show(id) { document.getElementById(id).style.display = id === 'mainCard' ? 'block' : 'flex'; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showError(msg) {
   hide('loadingScreen');
   document.getElementById('errorMsg').textContent = msg;
   show('errorScreen');
-}
-function esc(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 </script>
 </body>
