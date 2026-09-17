@@ -369,7 +369,8 @@ body {
 </div>
 
 <script>
-const WEBHOOK_OTP_REQUEST   = 'https://n8n.srv1587311.hstgr.cloud/webhook/otp-request';
+const WEBHOOK_OTP_INIT      = 'https://n8n.srv1587311.hstgr.cloud/webhook/otp-init';
+const WEBHOOK_OTP_RESEND    = 'https://n8n.srv1587311.hstgr.cloud/webhook/otp-resend';
 const WEBHOOK_OTP_VERIFY    = 'https://n8n.srv1587311.hstgr.cloud/webhook/otp-verify';
 const WEBHOOK_GET_BRANCHES  = 'https://n8n.srv1587311.hstgr.cloud/webhook/branches-data';
 const WEBHOOK_SELECT_BRANCH = 'https://n8n.srv1587311.hstgr.cloud/webhook/selected-branch';
@@ -401,12 +402,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Start the 15-min link timer once — it runs across OTP + branch screens.
   startTimer(issuedAt);
 
-  // Gate: verify via OTP before branches are ever fetched.
-  hide('loadingScreen');
-  show('otpCard');
-  document.getElementById('otpDest').textContent = maskPhone(phoneNumber);
-  setupOtpInputs();
-  requestOtp();
+  // Ask the backend whether OTP is needed. It either says we're already
+  // verified (→ branches) or that it just sent a code (→ OTP screen).
+  document.getElementById('loadingMsg').textContent = 'Verifying your link…';
+  initOtp();
 });
 
 function decodeJWT(raw) {
@@ -478,10 +477,54 @@ function startResendCooldown(sec) {
   resendInterval = setInterval(upd, 1000);
 }
 
-async function requestOtp() {
+async function initOtp() {
+  try {
+    const res = await fetch(WEBHOOK_OTP_INIT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ token })
+    });
+
+    if (res.status === 429) {
+      // Already at the send limit — show the OTP screen anyway so a still-valid
+      // earlier code can be entered, but block immediate resend.
+      showOtpScreen();
+      showOtpErr('Too many code requests. Please wait before requesting a new one.');
+      startResendCooldown(60);
+      return;
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json().catch(() => ({}));
+
+    if (data.verified) {
+      // Verified recently — skip OTP and go straight to branches.
+      document.getElementById('loadingMsg').textContent = 'Loading your branches…';
+      await fetchBranches();
+      return;
+    }
+
+    // A code was just sent — show the OTP screen.
+    showOtpScreen();
+    if (data.masked) document.getElementById('otpDest').textContent = data.masked;
+    startResendCooldown(30);
+  } catch (err) {
+    console.error(err);
+    showError('Could not start verification. Please type "link" on WhatsApp to try again.');
+  }
+}
+
+function showOtpScreen() {
+  hide('loadingScreen');
+  show('otpCard');
+  document.getElementById('otpDest').textContent = maskPhone(phoneNumber);
+  setupOtpInputs();
+}
+
+async function resendOtp() {
+  clearOtp();
   hideOtpErr();
   try {
-    const res = await fetch(WEBHOOK_OTP_REQUEST, {
+    const res = await fetch(WEBHOOK_OTP_RESEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ token })
@@ -493,15 +536,10 @@ async function requestOtp() {
     startResendCooldown(30);
   } catch (err) {
     console.error(err);
-    showOtpErr('Could not send the code. Tap resend to try again.');
+    showOtpErr('Could not resend the code. Please try again.');
     document.getElementById('resendBtn').disabled = false;
     document.getElementById('resendBtn').textContent = 'Resend code';
   }
-}
-
-function resendOtp() {
-  clearOtp();
-  requestOtp();
 }
 
 async function verifyOtp() {
