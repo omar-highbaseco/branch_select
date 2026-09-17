@@ -78,6 +78,7 @@ body {
   text-align: center; line-height: 1.65;
   margin-bottom: 28px;
 }
+.card p .dest { color: var(--ink); font-weight: 600; white-space: nowrap; }
 
 /* Label */
 .field-label {
@@ -117,6 +118,42 @@ body {
   transform: translateY(-50%);
   pointer-events: none; color: var(--ink-4);
 }
+
+/* OTP inputs */
+.otp-inputs {
+  display: flex; gap: 10px; justify-content: center;
+  margin-bottom: 20px;
+}
+.otp-inputs input {
+  width: 46px; height: 56px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  -moz-appearance: textfield;
+}
+.otp-inputs input::-webkit-outer-spin-button,
+.otp-inputs input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.otp-inputs input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,91,184,.10); }
+.otp-inputs input.filled { border-color: var(--primary); }
+
+/* Resend */
+.resend-row {
+  text-align: center; margin-top: 16px;
+  font-size: 12.5px; color: var(--ink-4);
+}
+.resend-btn {
+  background: none; border: none;
+  color: var(--primary); font-weight: 600; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 12.5px;
+  padding: 0 2px;
+}
+.resend-btn:disabled { color: var(--ink-4); cursor: not-allowed; }
 
 /* Timer */
 .timer {
@@ -203,6 +240,11 @@ body {
 @keyframes spin   { to { transform: rotate(360deg); } }
 @keyframes pop    { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:scale(1); } }
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+@media (max-width: 400px) {
+  .otp-inputs { gap: 7px; }
+  .otp-inputs input { width: 42px; height: 52px; font-size: 20px; }
+}
 </style>
 </head>
 <body>
@@ -210,7 +252,50 @@ body {
 <!-- Loading -->
 <div class="loading-wrap" id="loadingScreen">
   <div class="loader"></div>
-  <p style="font-size:13px;color:var(--ink-4)" id="loadingMsg">Loading your branches…</p>
+  <p style="font-size:13px;color:var(--ink-4)" id="loadingMsg">Verifying your link…</p>
+</div>
+
+<!-- OTP card -->
+<div class="card" id="otpCard" style="display:none;">
+  <div class="logo-wrap">
+    <div class="logo">HIGHBASE</div>
+    <div class="logo-sep"></div>
+    <div class="logo-sub">Verify</div>
+  </div>
+
+  <h1>Verify it's you</h1>
+  <p>Enter the 6-digit code we sent to your WhatsApp <span class="dest" id="otpDest">••</span>.</p>
+
+  <div class="otp-inputs" id="otpInputs">
+    <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+  </div>
+
+  <div class="timer" id="otpTimerBar">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span data-timer>Link expires in 15:00</span>
+  </div>
+
+  <div class="err" id="otpErr"></div>
+
+  <button class="btn" id="otpVerifyBtn" disabled onclick="verifyOtp()">
+    <span class="btn-label">Verify</span>
+    <div class="spinner"></div>
+  </button>
+
+  <div class="resend-row">
+    Didn't get the code?
+    <button class="resend-btn" id="resendBtn" onclick="resendOtp()" disabled>Resend code</button>
+  </div>
+
+  <div class="powered">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Secured by Highbase · 15-minute link
+  </div>
 </div>
 
 <!-- Main card -->
@@ -236,7 +321,7 @@ body {
 
   <div class="timer" id="timerBar">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <span id="timerText">Link expires in 15:00</span>
+    <span id="timerText" data-timer>Link expires in 15:00</span>
   </div>
 
   <div class="err" id="errBanner"></div>
@@ -284,14 +369,18 @@ body {
 </div>
 
 <script>
+const WEBHOOK_OTP_REQUEST   = 'https://n8n.srv1587311.hstgr.cloud/webhook/otp-request';
+const WEBHOOK_OTP_VERIFY    = 'https://n8n.srv1587311.hstgr.cloud/webhook/otp-verify';
 const WEBHOOK_GET_BRANCHES  = 'https://n8n.srv1587311.hstgr.cloud/webhook/branches-data';
 const WEBHOOK_SELECT_BRANCH = 'https://n8n.srv1587311.hstgr.cloud/webhook/selected-branch';
 
-let branches     = [];
-let phoneNumber  = null;
-let branchNumber = null;
-let token        = null;
+let branches      = [];
+let phoneNumber   = null;
+let branchNumber  = null;
+let token         = null;
+let issuedAt      = null;
 let timerInterval = null;
+let resendInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -307,8 +396,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   phoneNumber  = String(payload.PhoneNumber  || '');
   branchNumber = String(payload.BranchNumber || phoneNumber);
+  issuedAt     = payload.iat;
 
-  await fetchBranches(payload.iat);
+  // Start the 15-min link timer once — it runs across OTP + branch screens.
+  startTimer(issuedAt);
+
+  // Gate: verify via OTP before branches are ever fetched.
+  hide('loadingScreen');
+  show('otpCard');
+  document.getElementById('otpDest').textContent = maskPhone(phoneNumber);
+  setupOtpInputs();
+  requestOtp();
 });
 
 function decodeJWT(raw) {
@@ -319,7 +417,139 @@ function decodeJWT(raw) {
   } catch { return null; }
 }
 
-async function fetchBranches(iat) {
+function maskPhone(p) {
+  const s = String(p || '').replace(/\D/g, '');
+  return s ? '•• ' + s.slice(-2) : 'your WhatsApp';
+}
+
+/* ───────────── OTP ───────────── */
+
+function setupOtpInputs() {
+  const inputs = [...document.querySelectorAll('#otpInputs input')];
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
+      inp.classList.toggle('filled', !!inp.value);
+      if (inp.value && i < inputs.length - 1) inputs[i + 1].focus();
+      updateOtpBtn();
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i - 1].focus();
+    });
+    inp.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6).split('');
+      digits.forEach((d, j) => { if (inputs[j]) { inputs[j].value = d; inputs[j].classList.add('filled'); } });
+      updateOtpBtn();
+      (inputs[Math.min(digits.length, inputs.length - 1)] || inp).focus();
+    });
+  });
+  inputs[0].focus();
+}
+
+function getOtpCode() {
+  return [...document.querySelectorAll('#otpInputs input')].map(i => i.value).join('');
+}
+function updateOtpBtn() {
+  document.getElementById('otpVerifyBtn').disabled = getOtpCode().length !== 6;
+}
+function clearOtp() {
+  document.querySelectorAll('#otpInputs input').forEach(i => { i.value = ''; i.classList.remove('filled'); });
+  updateOtpBtn();
+  document.querySelector('#otpInputs input').focus();
+}
+function showOtpErr(msg) {
+  const b = document.getElementById('otpErr');
+  b.textContent = msg; b.classList.add('show');
+}
+function hideOtpErr() { document.getElementById('otpErr').classList.remove('show'); }
+
+function startResendCooldown(sec) {
+  const btn = document.getElementById('resendBtn');
+  let left = sec;
+  clearInterval(resendInterval);
+  const upd = () => {
+    btn.textContent = left > 0 ? 'Resend in ' + left + 's' : 'Resend code';
+    btn.disabled = left > 0;
+    if (left <= 0) clearInterval(resendInterval);
+    left--;
+  };
+  upd();
+  resendInterval = setInterval(upd, 1000);
+}
+
+async function requestOtp() {
+  hideOtpErr();
+  try {
+    const res = await fetch(WEBHOOK_OTP_REQUEST, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ token })
+    });
+    if (res.status === 429) { showOtpErr('Too many requests. Please wait a moment before trying again.'); startResendCooldown(60); return; }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json().catch(() => ({}));
+    if (data && data.masked) document.getElementById('otpDest').textContent = data.masked;
+    startResendCooldown(30);
+  } catch (err) {
+    console.error(err);
+    showOtpErr('Could not send the code. Tap resend to try again.');
+    document.getElementById('resendBtn').disabled = false;
+    document.getElementById('resendBtn').textContent = 'Resend code';
+  }
+}
+
+function resendOtp() {
+  clearOtp();
+  requestOtp();
+}
+
+async function verifyOtp() {
+  const code = getOtpCode();
+  if (code.length !== 6) return;
+
+  const btn = document.getElementById('otpVerifyBtn');
+  btn.classList.add('loading');
+  hideOtpErr();
+
+  try {
+    const res = await fetch(WEBHOOK_OTP_VERIFY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ token, code })
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && data.verified) {
+      // Verified — now fetch the branches (webhook is gated on this).
+      hide('otpCard');
+      document.getElementById('loadingMsg').textContent = 'Loading your branches…';
+      show('loadingScreen');
+      await fetchBranches();
+      return;
+    }
+
+    if (res.status === 423 || data.locked) {
+      showOtpErr('Too many attempts. Please request a new code.');
+      clearOtp();
+    } else {
+      const left = data.triesLeft;
+      showOtpErr(left != null
+        ? 'Incorrect code. ' + left + ' attempt' + (left === 1 ? '' : 's') + ' left.'
+        : 'Incorrect code. Please try again.');
+      clearOtp();
+    }
+  } catch (err) {
+    console.error(err);
+    showOtpErr('Could not verify the code. Please try again.');
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+/* ───────────── Branches ───────────── */
+
+async function fetchBranches() {
   try {
     const res = await fetch(
       WEBHOOK_GET_BRANCHES + '?phone=' + encodeURIComponent(branchNumber),
@@ -343,7 +573,6 @@ async function fetchBranches(iat) {
 
     hide('loadingScreen');
     show('mainCard');
-    startTimer(iat);
 
   } catch (err) {
     console.error(err);
@@ -357,23 +586,29 @@ function onSelectChange() {
   document.getElementById('errBanner').classList.remove('show');
 }
 
+/* ───────────── Timer (shared across OTP + branch screens) ───────────── */
+
 function startTimer(iat) {
   const expireSec = iat + 900;
   function tick() {
     const remaining = expireSec - Math.floor(Date.now() / 1000);
     if (remaining <= 0) {
       clearInterval(timerInterval);
-      hide('mainCard'); show('expiredScreen'); return;
+      hide('loadingScreen'); hide('otpCard'); hide('mainCard');
+      show('expiredScreen');
+      return;
     }
-    const m = Math.floor(remaining / 60).toString().padStart(2,'0');
-    const s = (remaining % 60).toString().padStart(2,'0');
-    document.getElementById('timerText').textContent = 'Link expires in ' + m + ':' + s;
-    const bar = document.getElementById('timerBar');
-    if (remaining <= 180) bar.classList.add('urgent');
+    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const s = (remaining % 60).toString().padStart(2, '0');
+    const label = 'Link expires in ' + m + ':' + s;
+    document.querySelectorAll('[data-timer]').forEach(el => { el.textContent = label; });
+    if (remaining <= 180) document.querySelectorAll('.timer').forEach(bar => bar.classList.add('urgent'));
   }
   tick();
   timerInterval = setInterval(tick, 1000);
 }
+
+/* ───────────── Submit ───────────── */
 
 async function submitSelection() {
   const selectedId = document.getElementById('branchSelect').value;
@@ -416,7 +651,12 @@ async function submitSelection() {
   }
 }
 
-function show(id) { document.getElementById(id).style.display = id === 'mainCard' ? 'block' : 'flex'; }
+/* ───────────── Screen helpers ───────────── */
+
+function show(id) {
+  const el = document.getElementById(id);
+  el.style.display = (id === 'mainCard' || id === 'otpCard') ? 'block' : 'flex';
+}
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showError(msg) {
   hide('loadingScreen');
